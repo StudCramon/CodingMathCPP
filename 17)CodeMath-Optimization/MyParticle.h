@@ -5,67 +5,23 @@
 
 class MyParticle
 {
-private:
-    MyVector position;
-    MyVector velocity;
-    MyVector gravity;
+public:
+    float x;
+    float y;
+    float vx;
+    float vy;
+    float gravity;
     float mass;
     float radius;
     float bounce;
     float friction;
-public:
+
     //constructors destructors---------------------------------------
-    MyParticle() {}
+    MyParticle() :x{0}, y{0}, vx{0}, vy{0}, gravity{0}, mass{0}, radius{0}, bounce{-1}, friction{1} {}
     MyParticle(float x, float y, float speed, float direction, float mass = 1, float gravity = 0, float radius = 0, float bounce = -1, float friction = 1);
     ~MyParticle() {}
-    //getters---------------------------------------------
-    const MyVector& GetPosition() const;
 
-    const MyVector& GetVelocity() const;
-
-    const MyVector& GetGravity() const;
-
-    float GetMass() const;
-
-    float GetRadius() const;
-
-    float GetBounce() const;
-
-    float GetFriction() const;
-    //setters------------------------------------------------------
-    void SetAll(float x, float y, float speed, float direction, float mass, float gravity, float radius, float bounce, float friction);
-
-    void SetPosition(float x, float y);
-
-    void SetX(float x);
-
-    void SetY(float y);
-
-    void SetMass(float mass);
-
-    void SetVelocity(const MyVector& velocity);
-
-    void SetVelocity(float speed, float direction);
-
-    void SetSpeed(float speed);
-
-    void SetAngle(float angle);
-
-    void SetVelX(float x);
-
-    void SetVelY(float y);
-
-    void SetGravity(float gravity);
-
-    void SetGravity(const MyVector& gravity);
-
-    void SetRadius(float radius);
-
-    void SetBounce(float bounce);
-
-    void SetFriction(float friction);
-    //functionality-----------------------------------------------------
-    void Accelerate(const MyVector& acceleration);
+    void Accelerate(float ax, float ay);
 
     void Move();
 

@@ -1,209 +1,100 @@
 #include "MyParticle.h"
 #include <math.h>
 
-MyParticle::MyParticle(float x, float y, float speed, float direction, float mass, float gravity, float radius, float bounce, float friction) 
+MyParticle::MyParticle(float x, float y, float speed, float direction, float mass = 1, float gravity = 0, float radius = 0, float bounce = -1, float friction = 1)
 {
-    position.setX(x);
-    position.setY(y);
-    velocity.setLenght(speed);
-    velocity.setAngle(direction);
-    this->gravity.setY(gravity);
+    this->x = x;
+    this->y = y;
+    this->vx = cos(direction) * speed;
+    this->vy = sin(direction) * speed;
     this->mass = mass;
-    this->radius = radius;
-    this->bounce = bounce;
-    this->friction = friction;
-}
-
-const MyVector& MyParticle::GetPosition() const 
-{
-    return position;
-}
-
-const MyVector& MyParticle::GetVelocity() const 
-{
-    return velocity;
-}
-
-const MyVector& MyParticle::GetGravity() const
-{
-    return gravity;
-}
-
-float MyParticle::GetMass() const
-{
-    return mass;
-}
-
-float MyParticle::GetRadius() const
-{
-    return radius;
-}
-
-float MyParticle::GetBounce() const
-{
-    return bounce;
-}
-
-float MyParticle::GetFriction() const
-{
-    return friction;
-}
-
-void MyParticle::SetAll(float x, float y, float speed, float direction, float mass, float gravity, float radius, float bounce, float friction) 
-{
-    position.setX(x);
-    position.setY(y);
-    velocity.setLenght(speed);
-    velocity.setAngle(direction);
-    this->gravity.setY(gravity);
-    this->mass = mass;
-    this->radius = radius;
-    this->bounce = bounce;
-    this->friction = friction;
-}
-
-void MyParticle::SetPosition(float x, float y) 
-{
-    position.setX(x);
-    position.setY(y);
-}
-
-void MyParticle::SetX(float x) 
-{
-    position.setX(x);
-}
-
-void MyParticle::SetY(float y) 
-{
-    position.setY(y);
-}
-
-void MyParticle::SetMass(float mass) 
-{
-    this->mass = mass;
-}
-
-void MyParticle::SetVelocity(const MyVector& velocity)
-{
-    this->velocity = velocity;
-}
-
-void MyParticle::SetVelocity(float speed, float direction) 
-{
-    this->velocity.setLenght(speed);
-    this->velocity.setAngle(direction);
-}
-
-void MyParticle::SetSpeed(float speed)
-{
-    velocity.setLenght(speed);
-}
-
-void MyParticle::SetAngle(float angle)
-{
-    velocity.setAngle(angle);
-}
-
-void MyParticle::SetVelX(float x)
-{
-    velocity.setX(x);
-}
-
-void MyParticle::SetVelY(float y)
-{
-    velocity.setY(y);
-}
-
-void MyParticle::SetGravity(float gravity) 
-{
-    this->gravity.setY(gravity);
-}
-
-void MyParticle::SetGravity(const MyVector& gravity) 
-{
     this->gravity = gravity;
-}
-
-void MyParticle::SetRadius(float radius)
-{
     this->radius = radius;
-}
-
-void MyParticle::SetBounce(float bounce)
-{
     this->bounce = bounce;
-}
-
-void MyParticle::SetFriction(float friction)
-{
     this->friction = friction;
 }
 
-void MyParticle::Accelerate(const MyVector& acceleration) 
+void MyParticle::Accelerate(float ax, float ay) 
 {
-    velocity += acceleration;
+    vx += ax;
+    vy += ay;
 }
 
 void MyParticle::Move() 
 {
-    velocity *= friction;
-    velocity += gravity;
-    position += velocity;
+    vx *= friction;
+    vy *= friction;
+    vy += gravity;
+    x += vx;
+    y += vy;
 }
 
 float MyParticle::AngleTo(const MyParticle& p2) 
 {
-    float dx = p2.GetPosition().getX() - this->position.getX();
-    float dy = p2.GetPosition().getY() - this->position.getY();
+    float dx = p2.x - this->x;
+    float dy = p2.y - this->y;
     return atan2(dy, dx);
 }
 
 float MyParticle::DistanceTo(const MyParticle& p2) 
 {
-    float dx = p2.GetPosition().getX() - this->position.getX();
-    float dy = p2.GetPosition().getY() - this->position.getY();
+    float dx = p2.x - this->x;
+    float dy = p2.y - this->y;
     return sqrt(dx*dx + dy*dy);
 }
 
 void MyParticle::GravitateTo(const MyParticle& p2) 
 {
-    MyVector gravity(0, 0);
-    float distance = this->DistanceTo(p2);
+    // MyVector gravity(0, 0);
+    // float distance = this->DistanceTo(p2);
 
-    gravity.setLenght(p2.mass/ (distance * distance));
-    gravity.setAngle(this->AngleTo(p2));
+    // gravity.setLenght(p2.mass/ (distance * distance));
+    // gravity.setAngle(this->AngleTo(p2));
 
-    this->velocity += gravity;
+    // this->vx += gravity.getX();
+    // this->vy += gravity.getY();
+
+    float dx = p2.x - this->x;
+    float dy = p2.y - this->y;
+    float dstSQ = dx * dx + dy * dy;
+    float dst = sqrt(dstSQ);
+    float force = p2.mass * dstSQ;
+    float ax = dx/dst * force;
+    float ay = dy/dst * force;
+
+    vx += ax;
+    vy += ay;
+
 }
 
 void spring(MyParticle& p1, MyParticle& p2, float separation, float k)
 {
-    MyVector distance = p1.GetPosition() - p2.GetPosition();
-    distance.setLenght(distance.getLenght() - separation);
+    // MyVector distance(p1.x - p2.x, p1.y - p2.y);
+    // distance.setLenght(distance.getLenght() - separation);
 
-    MyVector springForce = distance * k;
+    // MyVector springForce = distance * k;
 
-    p1.SetVelocity(p1.GetVelocity() - springForce);
-    p2.SetVelocity(p2.GetVelocity() + springForce);
+    // p1.SetVelocity(p1.GetVelocity() - springForce);
+    // p2.SetVelocity(p2.GetVelocity() + springForce);
 }
 
 void setBoundaies(MyParticle& point, float width, float height)
 {
-    if(point.GetPosition().getX() + point.GetRadius() > width)
+    if(point.x + point.radius > width)
     {
-        point.SetX(width - point.GetRadius());
+        point.x = width - point.radius;
     }
-    if(point.GetPosition().getX() - point.GetRadius() < 0)
+    if(point.x - point.radius < 0)
     {
-        point.SetX(0 + point.GetRadius());
+        point.x = 0 + point.radius;
     }
-    if(point.GetPosition().getY() + point.GetRadius() > height)
+    if(point.y + point.radius > height)
     {
-        point.SetY(height - point.GetRadius());
+        point.y = height - point.radius;
     }
-    if(point.GetPosition().getY() - point.GetRadius() < 0)
+    if(point.y - point.radius < 0)
     {
-        point.SetY(0 + point.GetRadius());
+        point.y = 0 + point.radius;
     }
 }
 
